@@ -18,17 +18,8 @@
 
 #include "Logging.h"
 
-#define RETURN_NULLPTR_IF_FAILED_WITH_LOGGING(val)                                       \
-    hr = val;                                                                            \
-    if (FAILED(hr))                                                                      \
-    {                                                                                    \
-        LogToFile(std::string(#val) + " Failed: " + std::system_category().message(hr)); \
-        return nullptr;                                                                  \
-    }
-
 IWICImagingFactory* _GetWIC()
 {
-    LogToFile(__FUNCTION__);
     static IWICImagingFactory* s_Factory = nullptr;
 
     if (s_Factory)
@@ -56,7 +47,6 @@ using Microsoft::WRL::ComPtr;
 ComPtr<IMFSample> LoadImageAsSample(ComPtr<IStream> imageStream, IMFMediaType* sampleMediaType)
 {
     HRESULT hr = S_OK;
-    LogToFile(__FUNCTION__);
 
     // Get target sample frame dimensions
     UINT targetWidth = 0;
@@ -84,7 +74,6 @@ ComPtr<IMFSample> LoadImageAsSample(ComPtr<IStream> imageStream, IMFMediaType* s
     ComPtr<IWICBitmapSource> sourceImageFrame;
     if (targetWidth != imageWidth || targetHeight != imageHeight)
     {
-        LogToFile("Scaling image");
         ComPtr<IWICBitmapScaler> scaler;
         RETURN_NULLPTR_IF_FAILED_WITH_LOGGING(pWIC->CreateBitmapScaler(&scaler));
         RETURN_NULLPTR_IF_FAILED_WITH_LOGGING(scaler->Initialize(decodedFrame.Get(), targetWidth, targetHeight, WICBitmapInterpolationModeHighQualityCubic));
@@ -92,7 +81,6 @@ ComPtr<IMFSample> LoadImageAsSample(ComPtr<IStream> imageStream, IMFMediaType* s
     }
     else
     {
-        LogToFile("No scaling required");
         sourceImageFrame.Attach(decodedFrame.Detach());
     }
 
@@ -156,11 +144,8 @@ ComPtr<IMFSample> LoadImageAsSample(ComPtr<IStream> imageStream, IMFMediaType* s
     // But if no conversion is needed, just return the input sample
     if (!memcmp(&inputFilter.guidSubtype, &outputFilter.guidSubtype, sizeof(GUID)))
     {
-        LogToFile("No convertion needed for blank frame");
         return inputSample;
     }
-
-    LogToFile("Conversion needed");
 
     IMFActivate** ppVDActivate = nullptr;
     UINT32 count = 0;
@@ -183,7 +168,7 @@ ComPtr<IMFSample> LoadImageAsSample(ComPtr<IStream> imageStream, IMFMediaType* s
     }
     if (!videoDecoderActivated)
     {
-        LogToFile("No converter avialable for this format");
+        LogToFile("No converter avialable for the selected format");
         return nullptr;
     }
     auto shutdownVideoDecoder = wil::scope_exit([&videoDecoder] { MFShutdownObject(videoDecoder.Get()); });

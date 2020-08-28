@@ -8,8 +8,6 @@
 HRESULT
 SimpleMediaSource::RuntimeClassInitialize()
 {
-    LogToFile(__FUNCTION__);
-
     HRESULT hr = S_OK;
 
     RETURN_IF_FAILED_WITH_LOGGING(MFCreateAttributes(&_spAttributes, 10));
@@ -63,8 +61,6 @@ SimpleMediaSource::GetEvent(
     // GetEvent can block indefinitely, so we don't hold the lock.
     // This requires some juggling with the event queue pointer.
 
-    LogToFile(__FUNCTION__);
-
     HRESULT hr = S_OK;
 
     ComPtr<IMFMediaEventQueue> spQueue;
@@ -89,8 +85,6 @@ SimpleMediaSource::QueueEvent(
     HRESULT hrStatus,
     _In_opt_ PROPVARIANT const* pvValue)
 {
-    LogToFile(__FUNCTION__);
-
     HRESULT hr = S_OK;
     auto lock = _critSec.Lock();
 
@@ -105,8 +99,6 @@ IFACEMETHODIMP
 SimpleMediaSource::CreatePresentationDescriptor(
     _COM_Outptr_ IMFPresentationDescriptor** ppPresentationDescriptor)
 {
-    LogToFile(__FUNCTION__);
-
     HRESULT hr = S_OK;
     auto lock = _critSec.Lock();
 
@@ -126,8 +118,6 @@ IFACEMETHODIMP
 SimpleMediaSource::GetCharacteristics(
     _Out_ DWORD* pdwCharacteristics)
 {
-    LogToFile(__FUNCTION__);
-
     HRESULT hr = S_OK;
     auto lock = _critSec.Lock();
 
@@ -146,7 +136,6 @@ SimpleMediaSource::GetCharacteristics(
 IFACEMETHODIMP
 SimpleMediaSource::Pause()
 {
-    LogToFile("Pause");
     // Pause() not required/needed
     return MF_E_INVALID_STATE_TRANSITION;
 }
@@ -154,8 +143,6 @@ SimpleMediaSource::Pause()
 IFACEMETHODIMP
 SimpleMediaSource::Shutdown()
 {
-    LogToFile(__FUNCTION__);
-
     HRESULT hr = S_OK;
     auto lock = _critSec.Lock();
 
@@ -185,8 +172,6 @@ SimpleMediaSource::Start(
     _In_opt_ const GUID* pguidTimeFormat,
     _In_ const PROPVARIANT* pvarStartPos)
 {
-    LogToFile(__FUNCTION__);
-
     HRESULT hr = S_OK;
     auto lock = _critSec.Lock();
     DWORD count = 0;
@@ -272,8 +257,6 @@ SimpleMediaSource::Start(
 IFACEMETHODIMP
 SimpleMediaSource::Stop()
 {
-    LogToFile(__FUNCTION__);
-
     HRESULT hr = S_OK;
     auto lock = _critSec.Lock();
     PROPVARIANT stopTime;
@@ -307,8 +290,6 @@ IFACEMETHODIMP
 SimpleMediaSource::GetSourceAttributes(
     _COM_Outptr_ IMFAttributes** sourceAttributes)
 {
-    LogToFile(__FUNCTION__);
-
     HRESULT hr = S_OK;
 
     auto lock = _critSec.Lock();
@@ -360,8 +341,6 @@ SimpleMediaSource::GetStreamAttributes(
     DWORD dwStreamIdentifier,
     _COM_Outptr_ IMFAttributes** ppAttributes)
 {
-    LogToFile(__FUNCTION__);
-
     HRESULT hr = S_OK;
     auto lock = _critSec.Lock();
 
@@ -390,8 +369,6 @@ SimpleMediaSource::SetD3DManager(
     _In_opt_ IUnknown* /*pManager*/
 )
 {
-    LogToFile(__FUNCTION__);
-
     // Return code is ignored by the frame work, this is a
     // best effort attempt to inform the media source of the
     // DXGI manager to use if DX surface support is available.
@@ -408,8 +385,6 @@ _Use_decl_annotations_
         _In_ REFIID iid,
         _Out_ LPVOID* ppvObject)
 {
-    LogToFile(__FUNCTION__);
-
     HRESULT hr = S_OK;
     auto lock = _critSec.Lock();
 
@@ -447,8 +422,6 @@ _Use_decl_annotations_
         _In_ ULONG,
         _Out_ ULONG*)
 {
-    LogToFile(__FUNCTION__);
-
     // ERROR_SET_NOT_FOUND is the standard error code returned
     // by the AV Stream driver framework when a miniport
     // driver does not register a handler for a KS operation.
@@ -466,8 +439,6 @@ _Use_decl_annotations_
         _In_ ULONG,
         _Out_ ULONG*)
 {
-    LogToFile(__FUNCTION__);
-
     Shutdown();
     return HRESULT_FROM_WIN32(ERROR_SET_NOT_FOUND);
 }
@@ -481,8 +452,6 @@ _Use_decl_annotations_
         _In_ ULONG,
         _Out_opt_ ULONG*)
 {
-    LogToFile(__FUNCTION__);
-
     return HRESULT_FROM_WIN32(ERROR_SET_NOT_FOUND);
 }
 
@@ -507,8 +476,6 @@ HRESULT
 SimpleMediaSource::_ValidatePresentationDescriptor(
     _In_ IMFPresentationDescriptor* pPD)
 {
-    LogToFile(__FUNCTION__);
-
     HRESULT hr = S_OK;
     DWORD cStreams = 0;
     bool anySelected = false;

@@ -33,8 +33,6 @@ namespace
 
 void DeviceList::Clear()
 {
-    LogToFile(__FUNCTION__);
-
     for (UINT32 i = 0; i < m_numberDevices; i++)
     {
         CoTaskMemFree(m_deviceFriendlyNames[i]);
@@ -56,8 +54,6 @@ void DeviceList::Clear()
 
 HRESULT DeviceList::EnumerateDevices()
 {
-    LogToFile(__FUNCTION__);
-
     HRESULT hr = S_OK;
     ComPtr<IMFAttributes> pAttributes;
     Clear();
@@ -98,8 +94,6 @@ HRESULT DeviceList::EnumerateDevices()
 
 HRESULT DeviceList::GetDevice(UINT32 index, IMFActivate** ppActivate)
 {
-    LogToFile(__FUNCTION__);
-
     if (index >= Count())
     {
         return E_INVALIDARG;
@@ -113,8 +107,6 @@ HRESULT DeviceList::GetDevice(UINT32 index, IMFActivate** ppActivate)
 
 std::wstring_view DeviceList::GetDeviceName(UINT32 index)
 {
-    LogToFile(__FUNCTION__);
-
     if (index >= Count())
     {
         return {};
@@ -131,8 +123,6 @@ std::wstring_view DeviceList::GetDeviceName(UINT32 index)
 
 HRESULT CopyAttribute(IMFAttributes* pSrc, IMFAttributes* pDest, const GUID& key)
 {
-    LogToFile(__FUNCTION__);
-
     PROPVARIANT var;
     PropVariantInit(&var);
 
@@ -156,8 +146,6 @@ bool areSame(double lhs, double rhs)
 
 ComPtr<IMFMediaType> SelectBestMediaType(IMFSourceReader* reader)
 {
-    LogToFile(__FUNCTION__);
-
     std::vector<ComPtr<IMFMediaType>> supportedMediaTypes;
 
     auto typeFramerate = [](IMFMediaType* type) {
@@ -187,14 +175,14 @@ ComPtr<IMFMediaType> SelectBestMediaType(IMFSourceReader* reader)
         GUID subtype{};
         nextType->GetGUID(MF_MT_SUBTYPE, &subtype);
 
-        LogToFile(std::string("Available format: ") +
-                  toMediaTypeString(subtype) +
-                  std::string(", width=") +
-                  std::to_string(width) +
-                  std::string(", height=") +
-                  std::to_string(height) +
-                  std::string(", aspect ratio=") +
-                  std::to_string(aspectRatio));
+        //LogToFile(std::string("Available format: ") +
+        //          toMediaTypeString(subtype) +
+        //          std::string(", width=") +
+        //          std::to_string(width) +
+        //          std::string(", height=") +
+        //          std::to_string(height) +
+        //          std::string(", aspect ratio=") +
+        //          std::to_string(aspectRatio));
 
         if (subtype != MFVideoFormat_YUY2 &&
             subtype != MFVideoFormat_RGB24 &&
@@ -273,8 +261,6 @@ HRESULT
 SimpleMediaStream::RuntimeClassInitialize(
     _In_ SimpleMediaSource* pSource)
 {
-    LogToFile(__FUNCTION__);
-
     HRESULT hr = S_OK;
 
     if (nullptr == pSource)
@@ -334,8 +320,6 @@ SimpleMediaStream::GetEvent(
     DWORD dwFlags,
     _COM_Outptr_ IMFMediaEvent** ppEvent)
 {
-    LogToFile(__FUNCTION__);
-
     // NOTE:
     // GetEvent can block indefinitely, so we don't hold the lock.
     // This requires some juggling with the event queue pointer.
@@ -364,8 +348,6 @@ SimpleMediaStream::QueueEvent(
     HRESULT hrStatus,
     _In_opt_ PROPVARIANT const* pvValue)
 {
-    LogToFile(__FUNCTION__);
-
     HRESULT hr = S_OK;
     auto lock = _critSec.Lock();
 
@@ -380,8 +362,6 @@ IFACEMETHODIMP
 SimpleMediaStream::GetMediaSource(
     _COM_Outptr_ IMFMediaSource** ppMediaSource)
 {
-    LogToFile(__FUNCTION__);
-
     HRESULT hr = S_OK;
     auto lock = _critSec.Lock();
 
@@ -403,8 +383,6 @@ IFACEMETHODIMP
 SimpleMediaStream::GetStreamDescriptor(
     _COM_Outptr_ IMFStreamDescriptor** ppStreamDescriptor)
 {
-    LogToFile(__FUNCTION__);
-
     HRESULT hr = S_OK;
     auto lock = _critSec.Lock();
 
@@ -500,8 +478,6 @@ IFACEMETHODIMP
 SimpleMediaStream::SetStreamState(
     MF_STREAM_STATE state)
 {
-    LogToFile(__FUNCTION__);
-
     HRESULT hr = S_OK;
     auto lock = _critSec.Lock();
     bool runningState = false;
@@ -511,19 +487,15 @@ SimpleMediaStream::SetStreamState(
     switch (state)
     {
     case MF_STREAM_STATE_PAUSED:
-        LogToFile("SetStreamState: MF_STREAM_STATE_PAUSED");
         goto done; // because not supported
     case MF_STREAM_STATE_RUNNING:
-        LogToFile("SetStreamState: MF_STREAM_STATE_RUNNING");
         runningState = true;
         break;
     case MF_STREAM_STATE_STOPPED:
-        LogToFile("SetStreamState: MF_STREAM_STATE_STOPPED");
         runningState = false;
         _parent->Shutdown();
         break;
     default:
-        LogToFile("SetStreamState: MF_E_INVALID_STATE_TRANSITION");
         hr = MF_E_INVALID_STATE_TRANSITION;
         break;
     }
@@ -538,8 +510,6 @@ IFACEMETHODIMP
 SimpleMediaStream::GetStreamState(
     _Out_ MF_STREAM_STATE* pState)
 {
-    LogToFile(__FUNCTION__);
-
     HRESULT hr = S_OK;
     auto lock = _critSec.Lock();
 
@@ -553,8 +523,6 @@ SimpleMediaStream::GetStreamState(
 HRESULT
 SimpleMediaStream::Shutdown()
 {
-    LogToFile(__FUNCTION__);
-
     HRESULT hr = S_OK;
 
     if (_settingsUpdateChannel.has_value())
@@ -563,7 +531,6 @@ SimpleMediaStream::Shutdown()
             auto settings = reinterpret_cast<CameraSettingsUpdateChannel*>(settingsMemory._data);
 
             settings->cameraInUse = false;
-
         });
     }
     auto lock = _critSec.Lock();
@@ -593,8 +560,6 @@ SimpleMediaStream::Shutdown()
 
 HRESULT SimpleMediaStream::UpdateSourceCamera(std::wstring_view newCameraName)
 {
-    LogToFile(__FUNCTION__);
-
     HRESULT hr = S_OK;
 
     _cameraList.Clear();
@@ -747,8 +712,6 @@ HRESULT
 SimpleMediaStream::_SetStreamAttributes(
     _In_ IMFAttributes* pAttributeStore)
 {
-    LogToFile(__FUNCTION__);
-
     HRESULT hr = S_OK;
 
     if (nullptr == pAttributeStore)
@@ -768,8 +731,6 @@ HRESULT
 SimpleMediaStream::_SetStreamDescriptorAttributes(
     _In_ IMFAttributes* pAttributeStore)
 {
-    LogToFile(__FUNCTION__);
-
     HRESULT hr = S_OK;
 
     if (nullptr == pAttributeStore)

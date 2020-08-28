@@ -7,10 +7,18 @@
 void LogToFile(std::string what);
 std::string toMediaTypeString(GUID subtype);
 
-#define RETURN_IF_FAILED_WITH_LOGGING(val)                                               \
-    hr = (val);                                                                          \
-    if (FAILED(hr))                                                                      \
-    {                                                                                    \
-        LogToFile(std::string(#val) + " Failed: " + std::system_category().message(hr)); \
-        return hr;                                                                       \
+#define RETURN_IF_FAILED_WITH_LOGGING(val)                                                             \
+    hr = (val);                                                                                        \
+    if (FAILED(hr))                                                                                    \
+    {                                                                                                  \
+        LogToFile(std::string(__FUNCTION__ "() ") + #val + ": " + std::system_category().message(hr)); \
+        return hr;                                                                                     \
+    }
+
+#define RETURN_NULLPTR_IF_FAILED_WITH_LOGGING(val)                                                     \
+    hr = val;                                                                                          \
+    if (FAILED(hr))                                                                                    \
+    {                                                                                                  \
+        LogToFile(std::string(__FUNCTION__ "() ") + #val + ": " + std::system_category().message(hr)); \
+        return nullptr;                                                                                \
     }
