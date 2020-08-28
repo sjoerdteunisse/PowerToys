@@ -30,48 +30,51 @@ namespace Microsoft.PowerToys.Settings.UI.Runner
         [STAThread]
         public static void Main(string[] args)
         {
-            App app = new App();
-            app.InitializeComponent();
-
-            if (args.Length >= ArgumentsQty)
+            using (new UI.App())
             {
-                int.TryParse(args[2], out int powerToysPID);
-                PowerToysPID = powerToysPID;
+                App app = new App();
+                app.InitializeComponent();
 
-                if (args[4] == "true")
+                if (args.Length >= ArgumentsQty)
                 {
-                    IsElevated = true;
+                    int.TryParse(args[2], out int powerToysPID);
+                    PowerToysPID = powerToysPID;
+
+                    if (args[4] == "true")
+                    {
+                        IsElevated = true;
+                    }
+                    else
+                    {
+                        IsElevated = false;
+                    }
+
+                    if (args[5] == "true")
+                    {
+                        IsUserAnAdmin = true;
+                    }
+                    else
+                    {
+                        IsUserAnAdmin = false;
+                    }
+
+                    RunnerHelper.WaitForPowerToysRunner(PowerToysPID, () =>
+                    {
+                        Environment.Exit(0);
+                    });
+
+                    ipcmanager = new TwoWayPipeMessageIPCManaged(args[1], args[0], null);
+                    ipcmanager.Start();
+                    app.Run();
                 }
                 else
                 {
-                    IsElevated = false;
+                    MessageBox.Show(
+                        "The application cannot be run as a standalone process. Please start the application through the runner.",
+                        "Forbidden",
+                        MessageBoxButton.OK);
+                    app.Shutdown();
                 }
-
-                if (args[5] == "true")
-                {
-                    IsUserAnAdmin = true;
-                }
-                else
-                {
-                    IsUserAnAdmin = false;
-                }
-
-                RunnerHelper.WaitForPowerToysRunner(PowerToysPID, () =>
-                {
-                    Environment.Exit(0);
-                });
-
-                ipcmanager = new TwoWayPipeMessageIPCManaged(args[1], args[0], null);
-                ipcmanager.Start();
-                app.Run();
-            }
-            else
-            {
-                MessageBox.Show(
-                    "The application cannot be run as a standalone process. Please start the application through the runner.",
-                    "Forbidden",
-                    MessageBoxButton.OK);
-                app.Shutdown();
             }
         }
 
