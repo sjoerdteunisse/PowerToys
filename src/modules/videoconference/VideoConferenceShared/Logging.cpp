@@ -11,12 +11,17 @@
 
 std::mutex logMutex;
 
-void LogToFile(std::string what)
+void LogToFile(std::string what, const bool verbose)
 {
-    std::lock_guard lock{ logMutex };
-
-    std::ofstream myfile;
-
+    const auto tempPath = std::filesystem::temp_directory_path();
+    if (verbose)
+    {
+        const bool verboseIndicatorFilePresent = std::filesystem::exists(tempPath / L"PowerToysVideoConferenceVerbose.flag");
+        if (!verboseIndicatorFilePresent)
+        {
+            return;
+        }
+    }
     time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     std::tm tm;
     localtime_s(&tm, &now);
@@ -25,8 +30,12 @@ void LogToFile(std::string what)
     const auto iter = prefix + sprintf_s(prefix, "[%ld]", pid);
     std::strftime(iter, sizeof(prefix) - (prefix - iter), "[%d.%m %H:%M:%S] ", &tm);
 
-    std::wstring logFilePath = std::filesystem::temp_directory_path();
-    logFilePath += L"\\VideoConference.log";
+    std::lock_guard lock{ logMutex };
+
+    std::ofstream myfile;
+
+    std::wstring logFilePath = tempPath;
+    logFilePath += L"\\PowerToysVideoConference.log";
     myfile.open(logFilePath, std::fstream::app);
 
     static const auto newLaunch = [&] {

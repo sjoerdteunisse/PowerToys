@@ -146,6 +146,7 @@ bool areSame(double lhs, double rhs)
 
 ComPtr<IMFMediaType> SelectBestMediaType(IMFSourceReader* reader)
 {
+    VERBOSE_LOG;
     std::vector<ComPtr<IMFMediaType>> supportedMediaTypes;
 
     auto typeFramerate = [](IMFMediaType* type) {
@@ -261,6 +262,7 @@ HRESULT
 SimpleMediaStream::RuntimeClassInitialize(
     _In_ SimpleMediaSource* pSource)
 {
+    VERBOSE_LOG;
     HRESULT hr = S_OK;
 
     if (nullptr == pSource)
@@ -279,7 +281,10 @@ SimpleMediaStream::RuntimeClassInitialize(
 
     if (_spMediaType)
     {
-        _overlayImage = LoadImageAsSample(newSettings.overlayImage, _spMediaType.Get());
+        if (newSettings.overlayImage)
+        {
+            _overlayImage = LoadImageAsSample(newSettings.overlayImage, _spMediaType.Get());
+        }
         _blackImage = LoadImageAsSample(blackBMPImage, _spMediaType.Get());
     }
 
@@ -523,6 +528,7 @@ SimpleMediaStream::GetStreamState(
 HRESULT
 SimpleMediaStream::Shutdown()
 {
+    VERBOSE_LOG;
     HRESULT hr = S_OK;
 
     if (_settingsUpdateChannel.has_value())
@@ -560,6 +566,7 @@ SimpleMediaStream::Shutdown()
 
 HRESULT SimpleMediaStream::UpdateSourceCamera(std::wstring_view newCameraName)
 {
+    VERBOSE_LOG;
     HRESULT hr = S_OK;
 
     _cameraList.Clear();

@@ -8,6 +8,7 @@
 HRESULT
 SimpleMediaSource::RuntimeClassInitialize()
 {
+    VERBOSE_LOG;
     HRESULT hr = S_OK;
 
     RETURN_IF_FAILED_WITH_LOGGING(MFCreateAttributes(&_spAttributes, 10));
@@ -99,6 +100,7 @@ IFACEMETHODIMP
 SimpleMediaSource::CreatePresentationDescriptor(
     _COM_Outptr_ IMFPresentationDescriptor** ppPresentationDescriptor)
 {
+    VERBOSE_LOG;
     HRESULT hr = S_OK;
     auto lock = _critSec.Lock();
 
@@ -143,6 +145,7 @@ SimpleMediaSource::Pause()
 IFACEMETHODIMP
 SimpleMediaSource::Shutdown()
 {
+    VERBOSE_LOG;
     HRESULT hr = S_OK;
     auto lock = _critSec.Lock();
 
@@ -172,6 +175,7 @@ SimpleMediaSource::Start(
     _In_opt_ const GUID* pguidTimeFormat,
     _In_ const PROPVARIANT* pvarStartPos)
 {
+    VERBOSE_LOG;
     HRESULT hr = S_OK;
     auto lock = _critSec.Lock();
     DWORD count = 0;
@@ -257,6 +261,7 @@ SimpleMediaSource::Start(
 IFACEMETHODIMP
 SimpleMediaSource::Stop()
 {
+    VERBOSE_LOG;
     HRESULT hr = S_OK;
     auto lock = _critSec.Lock();
     PROPVARIANT stopTime;
